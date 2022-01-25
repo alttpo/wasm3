@@ -14,7 +14,7 @@
 // a central function you can be breakpoint:
 void ExceptionBreakpoint (cstr_t i_exception, cstr_t i_message)
 {
-    printf ("\nexception: '%s' @ %s\n", i_exception, i_message);
+    fprintf (stderr, "\nexception: '%s' @ %s\n", i_exception, i_message);
     return;
 }
 
@@ -28,18 +28,18 @@ OpInfo;
 
 void  m3_PrintM3Info  ()
 {
-    printf ("\n-- m3 configuration --------------------------------------------\n");
-//  printf (" sizeof M3CodePage    : %zu bytes  (%d slots) \n", sizeof (M3CodePage), c_m3CodePageNumSlots);
-    printf (" sizeof M3MemPage     : %u bytes              \n", d_m3MemPageSize);
-    printf (" sizeof M3Compilation : %zu bytes             \n", sizeof (M3Compilation));
-    printf (" sizeof M3Function    : %zu bytes             \n", sizeof (M3Function));
-    printf ("----------------------------------------------------------------\n\n");
+    fprintf (stderr, "\n-- m3 configuration --------------------------------------------\n");
+//  fprintf (stderr, " sizeof M3CodePage    : %zu bytes  (%d slots) \n", sizeof (M3CodePage), c_m3CodePageNumSlots);
+    fprintf (stderr, " sizeof M3MemPage     : %u bytes              \n", d_m3MemPageSize);
+    fprintf (stderr, " sizeof M3Compilation : %zu bytes             \n", sizeof (M3Compilation));
+    fprintf (stderr, " sizeof M3Function    : %zu bytes             \n", sizeof (M3Function));
+    fprintf (stderr, "----------------------------------------------------------------\n\n");
 }
 
 
 void *  v_PrintEnvModuleInfo  (IM3Module i_module, u32 * io_index)
 {
-    printf (" module [%u]  name: '%s'; funcs: %d  \n", * io_index++, i_module->name, i_module->numFunctions);
+    fprintf (stderr, " module [%u]  name: '%s'; funcs: %d  \n", * io_index++, i_module->name, i_module->numFunctions);
 
     return NULL;
 }
@@ -47,14 +47,14 @@ void *  v_PrintEnvModuleInfo  (IM3Module i_module, u32 * io_index)
 
 void  m3_PrintRuntimeInfo  (IM3Runtime i_runtime)
 {
-    printf ("\n-- m3 runtime -------------------------------------------------\n");
+    fprintf (stderr, "\n-- m3 runtime -------------------------------------------------\n");
 
-    printf (" stack-size: %zu   \n\n", i_runtime->numStackSlots * sizeof (m3slot_t));
+    fprintf (stderr, " stack-size: %zu   \n\n", i_runtime->numStackSlots * sizeof (m3slot_t));
 
     u32 moduleIndex = 0;
     ForEachModule (i_runtime, (ModuleVisitor) v_PrintEnvModuleInfo, & moduleIndex);
 
-    printf ("----------------------------------------------------------------\n\n");
+    fprintf (stderr, "----------------------------------------------------------------\n\n");
 }
 
 
@@ -162,7 +162,7 @@ cstr_t  SPrintFunctionArgList  (IM3Function i_function, m3stack_t i_sp)
             }
         }
     }
-    else printf ("null signature");
+    else fprintf (stderr, "null signature");
 
     ret = snprintf (s, e-s, ")");
     s += M3_MAX (0, ret);
@@ -349,8 +349,8 @@ void  dump_type_stack  (IM3Compilation o)
     // display whether r0 or fp0 is allocated. these should then also be reflected somewhere in the stack too.
     d_m3Log(stack, "\n");
     d_m3Log(stack, "        ");
-    printf ("%s %s    ", regAllocated [0] ? "(r0)" : "    ", regAllocated [1] ? "(fp0)" : "     ");
-    printf("\n");
+    fprintf (stderr, "%s %s    ", regAllocated [0] ? "(r0)" : "    ", regAllocated [1] ? "(fp0)" : "     ");
+    fprintf (stderr, "\n");
 
     for (u32 p = 1; p <= 2; ++p)
     {
@@ -359,10 +359,10 @@ void  dump_type_stack  (IM3Compilation o)
         for (u32 i = 0; i < o->stackIndex; ++i)
         {
             if (i > 0 and i == o->stackFirstDynamicIndex)
-                printf ("#");
+                fprintf (stderr, "#");
 
             if (i == o->block.blockStackIndex)
-                printf (">");
+                fprintf (stderr, ">");
 
             const char * type = c_waCompactTypes [o->typeStack [i]];
 
@@ -408,10 +408,10 @@ void  dump_type_stack  (IM3Compilation o)
                     strcat (item, " ");
             }
 
-            printf ("|%s ", item);
+            fprintf (stderr, "|%s ", item);
 
         }
-        printf ("\n");
+        fprintf (stderr, "\n");
     }
 
 //    for (u32 r = 0; r < 2; ++r)
@@ -424,23 +424,23 @@ void  dump_type_stack  (IM3Compilation o)
         d_m3Log (stack, "                      -");
 
         for (u16 i = o->slotFirstDynamicIndex; i < maxSlot; ++i)
-            printf ("----");
+            fprintf (stderr, "----");
 
-        printf ("\n");
+        fprintf (stderr, "\n");
 
         d_m3Log (stack, "                 slot |");
         for (u16 i = o->slotFirstDynamicIndex; i < maxSlot; ++i)
-            printf ("%3d|", i);
+            fprintf (stderr, "%3d|", i);
 
-        printf ("\n");
+        fprintf (stderr, "\n");
         d_m3Log (stack, "                alloc |");
 
         for (u16 i = o->slotFirstDynamicIndex; i < maxSlot; ++i)
         {
-            printf ("%3d|", o->m3Slots [i]);
+            fprintf (stderr, "%3d|", o->m3Slots [i]);
         }
 
-        printf ("\n");
+        fprintf (stderr, "\n");
     }
     d_m3Log(stack, "\n");
 }
@@ -486,9 +486,9 @@ void  log_emit  (IM3Compilation o, IM3Operation i_operation)
     d_m3Log(emit, "");
     if (i.info)
     {
-        printf ("%p: %s\n", GetPagePC (o->page),  i.info->name);
+        fprintf (stderr, "%p: %s\n", GetPagePC (o->page),  i.info->name);
     }
-    else printf ("not found: %p\n", i_operation);
+    else fprintf (stderr, "not found: %p\n", i_operation);
 }
 
 #endif // DEBUG
